@@ -26,9 +26,11 @@ for org in `curl -u "$GITHUB_USER:$GITHUB_AUTH_TOKEN" "https://api.github.com/us
   LAST_PAGE_CURL_COMMAND=$(curl -I -u "$GITHUB_USER:$GITHUB_AUTH_TOKEN" "https://api.github.com/orgs/${org}/members?per_page=$GITHUB_MAX_RESULTS_PERPAGE")
   LAST_PAGE=$(echo $LAST_PAGE_CURL_COMMAND|grep Link:|grep -Eo '&page=[0-9]'|sed -e 's/&page\=//g'|tail -1)
 
+  [ -e "${org}.json" ] && rm "${org}.json"
+
   if [ -z "$LAST_PAGE" ]; then 
     curl -u "$GITHUB_USER:$GITHUB_AUTH_TOKEN" "https://api.github.com/orgs/${org}/members?per_page=$GITHUB_MAX_RESULTS_PERPAGE" >> ${org}.json
- else
+  else
     for (( i=1; i<=${LAST_PAGE}; i++)); do
       curl -u "$GITHUB_USER:$GITHUB_AUTH_TOKEN" "https://api.github.com/orgs/${org}/members?per_page=$GITHUB_MAX_RESULTS_PERPAGE&page=${i}" >> ${org}.json
     done
